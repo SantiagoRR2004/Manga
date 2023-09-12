@@ -1,6 +1,6 @@
-import Utils
-import FileHandling
-import Internet
+from Modules import Utils
+from Modules import FileHandling
+from Modules import Internet
 import os
 import zipfile
 from selenium import webdriver

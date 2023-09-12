@@ -1,5 +1,5 @@
 __pycache__/
-Manga/.BerserkJPG
-Manga/Berserk CBZ
-Manga/Berserk PDF
-Manga/.BerserkJPG.zip
+Manga/.*JPG
+Manga/* CBZ
+Manga/* PDF
+Manga/.*JPG.zip

@@ -1,6 +1,8 @@
-import Utils
-import FileHandling
+from Modules import Utils
 import os
+
+
+directory = os.path.dirname(os.path.abspath(__file__))
 
 manga = "Berserk"
 minimum = "Episode"
@@ -13,7 +15,7 @@ naming = {"Episode":{"inversion":False,"numeration":False},
           "Arc":{"inversion":True,"numeration":False}}
 
 
-Utils.preparationForCBZ(manga,minimum,division,naming)
+Utils.preparationForCBZ(manga,minimum,directory,division,naming)
 
 
 quit()

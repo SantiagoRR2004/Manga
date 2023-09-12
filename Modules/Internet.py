@@ -1,5 +1,5 @@
 import requests
-import FileHandling
+from Modules import FileHandling
 import os
 import random
 import time
@@ -60,11 +60,10 @@ return images;
 
     return sorted(list(set(png_image_urls)))
 
-def mangasee123Downloader(manga,chapter,maxDownload,skip=[],missing=[]):
+def mangasee123Downloader(manga,chapter,maxDownload,callerDirectory,skip=[],missing=[]):
 
     web = "https://mangasee123.com/rss/"+manga+".xml"
-    folder = "."+manga+"JPG"
-
+    folder = os.path.join(callerDirectory,"."+manga+"JPG")
     urls = mangasee123UrlsXML(web)
 
     for x in skip:
@@ -82,37 +81,26 @@ def mangasee123Downloader(manga,chapter,maxDownload,skip=[],missing=[]):
         print("There starting chapter is too high")
         chapter = len(urls)
 
-    
-
     FileHandling.ensureExistance(folder)
-
     driver = configureChrome()
 
-
-    while chapter <= maxDownload:
-        print(chapter)
-        print(len(urls))
-        
+    while chapter <= maxDownload:        
         if chapter in missing:
             pass
 
         else:
             driver.get(urls[chapter-1])
-
             clickButton(driver,"Long Strip")
 
-
             png_image_urls = findPNGs(driver)
-
 
             for i in range(len(png_image_urls)):
                 name = str(chapter) + "{:0>{}}".format(i, 3) + ".jpg" # Try to change it to png
                 downloadImage(png_image_urls[i], os.path.join(folder,name))
 
-        
         print("Se ha descargado el capítulo "+str(chapter))
         chapter += 1
-        time.sleep(0.5)
+        time.sleep(random.uniform(1, 10))
 
     driver.quit()
 

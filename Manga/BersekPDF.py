@@ -1,7 +1,8 @@
-import Utils
-import FileHandling
+from Modules import Utils
+from Modules import FileHandling
 import os
 
+directory = os.path.dirname(os.path.abspath(__file__))
 manga = "Berserk"
 minimum = "Episode"
 division = "Volume"
@@ -13,13 +14,13 @@ naming = {"Episode":{"inversion":False,"numeration":False},
           "Arc":{"inversion":True,"numeration":False}}
 
 
+image_folder = os.path.join(directory,"." + manga + "JPG")
+enumeration = os.path.join(directory,manga + "Numeration.csv")
+pdfFolder = os.path.join(directory,manga + " PDF")
 
-image_folder = "." + manga + "JPG"
-enumeration = manga + "Numeration.csv"
-pdfFolder = manga + " PDF"
 
-
-FileHandling.decompressZip(image_folder)
+FileHandling.ensureExistance(image_folder)
+FileHandling.ensureExistance(pdfFolder)
 
 enumeration = FileHandling.openCsv(enumeration)
 images = FileHandling.getImages(image_folder)

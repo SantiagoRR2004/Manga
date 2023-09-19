@@ -1,8 +1,7 @@
-from Modules import Utils
 from Modules import FileHandling
 from Modules import Internet
+from Modules import zipping
 import os
-import zipfile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -54,7 +53,7 @@ print("Se ha descargado el prototipo ")
 
 driver.quit()
 
-FileHandling.zipAndDelete(folder)
+zipping.zipAndDelete(folder)
 
 quit()
 

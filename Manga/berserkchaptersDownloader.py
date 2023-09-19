@@ -1,8 +1,8 @@
-import Utils
+from Modules import Utils
+from Modules import FileHandling
 import requests
 from bs4 import BeautifulSoup
 import os
-import zipfile
 
 # https://mangaclash.com/manga/jojos-bizarre-adventure/chapter-1/
 
@@ -26,12 +26,7 @@ for x in skip:
 
 urls.insert(98,"missing")
 
-if not os.path.exists(folder):
-    if os.path.isfile(".BerserkJPG.zip"):
-        with zipfile.ZipFile(".BerserkJPG.zip","r") as zip_ref:
-                zip_ref.extractall()
-    else:
-         os.makedirs(folder)
+FileHandling.ensureExistance(folder)
 
 
 while chapter <= maxDownload:

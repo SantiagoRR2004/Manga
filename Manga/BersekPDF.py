@@ -1,5 +1,6 @@
 from Modules import Utils
 from Modules import FileHandling
+from Modules import zipping
 import os
 
 directory = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +36,6 @@ for i in divide:
     name = Utils.nameCreator(manga,division,namesPdf[divide.index(i)],naming[division]["inversion"],divide.index(i)+1,naming[division]["numeration"],".pdf")
     Utils.convert_images_to_pdf(image_folder, i[::-1], os.path.join(pdfFolder, name))
 
-FileHandling.zipAndDelete(image_folder)
+zipping.zipAndDelete(image_folder)
 
 quit()

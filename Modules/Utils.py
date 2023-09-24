@@ -8,31 +8,6 @@ from Modules import FileHandling
 from Modules import zipping
 #https://stackoverflow.com/questions/44375872/pypdf2-returning-blank-pdf-after-copy
 
-def deleteFolder(path):
-    emptyFolder(path)
-    os.removedirs(path)
-
-def emptyFolder(path):
-    for filename in os.listdir(path):
-            if os.path.isdir(os.path.join(path,filename)):
-                deleteFolder(path)
-            else:
-                os.remove(os.path.join(path,filename))
-
-def download_image(url, dest_file):
-    if not os.path.isfile(dest_file):
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(dest_file, 'wb') as f:
-                f.write(response.content)
-
-def get_images(image_folder):
-    # Get a list of all JPEG files in the specified folder
-    image_files = [f for f in os.listdir(image_folder) if f.endswith(".jpg")]
-    numbers = [int(x[:-4]) for x in image_files]
-    image_files = [x for _,x in sorted(zip(numbers,image_files))]
-    return image_files
-
 
 def divider(images,classifier,key,minimum):
     toret = []

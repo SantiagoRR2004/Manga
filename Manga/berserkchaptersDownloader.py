@@ -1,5 +1,7 @@
 from Modules import Utils
 from Modules import FileHandling
+from Modules import zipping
+from Modules import Internet
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -58,14 +60,13 @@ while chapter <= maxDownload:
         
         for i in images:
             name = str(chapter*1000 + int(i.img["src"].split('/')[-1][:-4])) + ".jpg"
-            Utils.download_image(i.img["src"], os.path.join(folder,name))
+            Internet.downloadImage(i.img["src"], os.path.join(folder,name))
     
     print("Se ha descargado el capítulo "+str(chapter))
     chapter += 1
 ##    print(urls[chapter-1])
 
-Utils.zipdir(folder)
-Utils.deleteFolder(folder)
+zipping.zipAndDelete(folder)
 
 quit()
 

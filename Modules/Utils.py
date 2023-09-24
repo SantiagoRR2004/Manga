@@ -1,9 +1,9 @@
-import requests
 import os
 from PIL import Image
 import PyPDF2
 from reportlab.pdfgen import canvas
 import os
+import zipfile
 from Modules import FileHandling
 from Modules import zipping
 #https://stackoverflow.com/questions/44375872/pypdf2-returning-blank-pdf-after-copy
@@ -56,7 +56,7 @@ def convert_images_to_pdf(image_folder,imageList, output_pdf,temporalFolder = ".
             # We don't close the pdfs manually
 
     for pdf in smallerPdfs:
-       pdf_writer.add_page(pdf.pages[0])
+        pdf_writer.add_page(pdf.pages[0])
        
     # Save the resulting PDF to the specified output path
     with open(output_pdf, 'wb') as output:

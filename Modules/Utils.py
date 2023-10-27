@@ -73,7 +73,7 @@ def create_cbz(images_folder, imagesList, output_cbz,temporalFolder = ".Temporal
         for image_file in imagesList: 
             FileHandling.copyFile(images_folder,image_file,temporalFolder,str(imagesList.index(image_file))+".jpg")
         images_folder = temporalFolder
-        imagesList = FileHandling.getImages(temporalFolder)
+        imagesList = FileHandling.findPatternFolder(temporalFolder,".jpg$")
 
     with zipfile.ZipFile(output_cbz, 'w', zipfile.ZIP_DEFLATED) as cbz:
         for image_file in imagesList:
@@ -109,7 +109,7 @@ def preparationForCBZ(manga,minimum,callerDirectory,division,naming):
     FileHandling.ensureExistance(pdfFolder)
 
     enumeration = FileHandling.openCsv(enumeration)
-    images = FileHandling.getImages(image_folder)
+    images = FileHandling.findPatternFolder(image_folder,".jpg$")
     divide = divider(images,enumeration,division,minimum)
 
     names = []

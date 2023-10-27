@@ -24,7 +24,7 @@ FileHandling.ensureExistance(image_folder)
 FileHandling.ensureExistance(pdfFolder)
 
 enumeration = FileHandling.openCsv(enumeration)
-images = FileHandling.getImages(image_folder)
+images = FileHandling.findPatternFolder(image_folder,".jpg$")
 divide = Utils.divider(images,enumeration,division,minimum)
 
 

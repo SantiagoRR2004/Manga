@@ -3,6 +3,7 @@ from PIL import Image
 import os
 import zipfile
 from Modules import FileHandling
+from Modules import CsvHandling
 from Modules import zipping
 
 
@@ -62,7 +63,7 @@ def preparationForCBZ(manga,minimum,callerDirectory,division,naming):
     FileHandling.ensureExistance(image_folder)
     FileHandling.ensureExistance(pdfFolder)
 
-    enumeration = FileHandling.openCsv(enumeration)
+    enumeration = CsvHandling.openCsv(enumeration)
     images = FileHandling.findPatternFolder(image_folder,".jpg$")
     divide = divider(images,enumeration,division,minimum)
 

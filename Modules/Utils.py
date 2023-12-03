@@ -6,7 +6,6 @@ from Modules import FileHandling
 from Modules import CsvHandling
 from Modules import zipping
 
-
 def divider(images,classifier,key,minimum):
     toret = []
     my_list = [x for i, x in enumerate(classifier[key]) if x not in classifier[key][:i]]

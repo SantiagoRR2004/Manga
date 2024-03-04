@@ -1,43 +1,48 @@
 {
-    "naming": {
-        "Episode": {
-            "inversion":false,
-            "numeration":false
-        },
-        "Title": {
-            "inversion":false,
-            "numeration":true
-        },
-        "Volume": {
-            "inversion":false,
-            "numeration":false
-        },
-        "Chapter": {
-            "inversion":true,
-            "numeration":false
-        },
-        "Arc": {
-            "inversion":true,
-            "numeration":false
-        },
-        "Stage": {
-            "inversion":false,
-            "numeration":false
-        }
+  "naming": {
+    "Episode": {
+      "inversion": false,
+      "numeration": false
     },
-    "Berserk": {
-        "skip": [
-            "https://mangasee123.com/read-online/Berserk-chapter-99.5-index-2-page-1.html",
-            "https://mangasee123.com/read-online/Berserk-chapter-350.5-index-2-page-1.html"
-        ],
-        "missing": [
-            99
-        ],
-        "minimum": "Episode"
+    "Title": {
+      "inversion": false,
+      "numeration": true
     },
-    "Neon-Genesis-Evangelion": {
-        "skip": [],
-        "missing": [],
-        "minimum": "Stage"
+    "Volume": {
+      "inversion": false,
+      "numeration": false
+    },
+    "Chapter": {
+      "inversion": true,
+      "numeration": false
+    },
+    "Arc": {
+      "inversion": true,
+      "numeration": false
+    },
+    "Stage": {
+      "inversion": false,
+      "numeration": false
     }
+  },
+  "Berserk": {
+    "skip": [
+      "https://mangasee123.com/read-online/Berserk-chapter-99.5-index-2-page-1.html",
+      "https://mangasee123.com/read-online/Berserk-chapter-350.5-index-2-page-1.html"
+    ],
+    "missing": [
+      99
+    ],
+    "minimum": "Episode"
+  },
+  "Neon-Genesis-Evangelion": {
+    "skip": [],
+    "missing": [],
+    "minimum": "Stage"
+  },
+  "Phantom-Blood": {
+    "skip": [],
+    "missing": [],
+    "minimum": "Chapter"
+  }
 }

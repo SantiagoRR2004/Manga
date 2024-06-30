@@ -5,11 +5,13 @@ import os
 import random
 import time
 from bs4 import BeautifulSoup
-from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 def downloadImage(url, dest_file):
     if not os.path.isfile(dest_file):
@@ -25,12 +27,24 @@ def mangasee123UrlsXML(web):
     urls = [item.find('link').text for item in page.find_all('item')]
     return urls[::-1]
 
-def configureChrome():
+def configureChrome() -> webdriver.Chrome:
+    """
+    Configures a Chrome WebDriver instance
+    and tries to say it is not automated
+    
+    Returns:
+        webdriver.Chrome: A WebDriver instance
+    """
     # pip install --upgrade selenium
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless")
-    chrome_options.binary_location = "/opt/google/chrome/google-chrome"
-    return webdriver.Chrome(options=chrome_options)
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+    # userDataDir = os.path.join(os.path.expanduser("~"), ".config", "google-chrome", "Default")
+    # chrome_options.add_argument(f"user-data-dir={userDataDir}")
+    service = Service(ChromeDriverManager().install())
+    return webdriver.Chrome(options=chrome_options, service=service)
 
 def clickButton(driver,name):
     wait = WebDriverWait(driver, 10)  # Wait up to 10 seconds for the button to be clickable
@@ -128,5 +142,3 @@ def mangasee123Downloader(manga,chapter,maxDownload,callerDirectory,skip=[],miss
     driver.quit()
 
     zipping.zipAndDelete(folder)
-
-

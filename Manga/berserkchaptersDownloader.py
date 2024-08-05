@@ -11,10 +11,10 @@ import os
 
 maxChapter = 371+16
 maxDownload = 150
-web = "https://berserkchapters.com/manga/berserk-chapter-1/"
+web = "https://readberserk.com/manga/berserk-chapter-1/"
 chapter = 50
 folder = ".BerserkJPG"
-skip = ["https://berserkchapters.com/manga/berserk-chapter-99-5/","https://berserkchapters.com/manga/berserk-chapter-350-5/"]
+skip = ["https://readberserk.com/manga/berserk-chapter-99-5/","https://readberserk.com/manga/berserk-chapter-350-5/"]
 
 r = requests.get(web)
 print(r)

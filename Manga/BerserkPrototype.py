@@ -2,11 +2,6 @@ from Modules import FileHandling
 from Modules import Internet
 from Modules import zipping
 import os
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
 
 
 script = """
@@ -22,7 +17,7 @@ for (var i = 0; i < mainContainerElements.length; i++) {
 return images;
 """
 
-folder = ".BerserkJPG"
+folder = os.path.join(os.path.dirname(os.path.abspath(__file__)),"."+"Berserk"+"JPG")
 web = "https://mangasee123.com/read-online/Berserk-chapter-99.5-index-2-page-1.html"
 
 

@@ -5,4 +5,4 @@ directory = os.path.dirname(os.path.abspath(__file__))
 manga = "Neon Genesis Evangelion"
 division = "Stage"
 
-PDFUtils.preparationForPDF(manga,directory,division)
+PDFUtils.preparationForPDF(manga, directory, division)

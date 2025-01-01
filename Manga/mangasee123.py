@@ -7,4 +7,4 @@ manga = "Berserk"
 maxDownload = 1
 minimum = 1
 
-Internet.mangasee123Downloader(manga,minimum,maxDownload,directory)
+Internet.mangasee123Downloader(manga, minimum, maxDownload, directory)

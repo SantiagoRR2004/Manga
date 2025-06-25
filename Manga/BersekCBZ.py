@@ -1,4 +1,4 @@
-from Modules import Utils
+from Modules import mangaUtils
 import os
 
 
@@ -9,7 +9,7 @@ minimum = "Episode"
 division = "Chapter"
 
 
-Utils.preparationForCBZ(manga, minimum, directory, division)
+mangaUtils.preparationForCBZ(manga, minimum, directory, division)
 
 
 quit()

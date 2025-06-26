@@ -20,11 +20,11 @@ webs = [
     "https://readjojos.com/chapter/jojos-bizarre-adventure-part-8-jojolion-chapter-1/",
     "https://readjojos.com/chapter/jojo-no-kimyou-na-bouken-part-9-the-jojolands-chapter-1/",
 ]
-folder = "Manga/.JoJoJPG"
+folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".JoJoJPG")
 
 # Start and end of the chapters to download
 chapter = 1
-maxDownload = 1
+maxDownload = 297
 
 # Get all the URLs of the chapters
 urls = []
@@ -34,6 +34,9 @@ for web in webs:
     urls.extend(
         [x["value"] for x in (page.find_all("select")[0]).find_all("option")][::-1]
     )
+
+# Eliminate urls that end with /
+urls = [url for url in urls if not url.endswith("/")]
 
 # Ensure there are enough URLs to download
 chapter = max(1, chapter)

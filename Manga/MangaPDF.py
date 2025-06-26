@@ -1,9 +1,0 @@
-from Modules import mangaUtils
-import os
-
-directory = os.path.dirname(os.path.abspath(__file__))
-manga = "Neon Genesis Evangelion"
-division = "Stage"
-
-mangaCreator = mangaUtils.MangaCreator(manga, directory)
-mangaCreator.createFiles(division, "PDF")

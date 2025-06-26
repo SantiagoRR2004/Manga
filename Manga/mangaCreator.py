@@ -6,4 +6,4 @@ manga = "Berserk"
 division = "Episode"
 
 mangaCreator = mangaUtils.MangaCreator(manga, directory)
-mangaCreator.createFiles(division, "PDF")
+mangaCreator.createFiles(division, "ZIP")

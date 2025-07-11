@@ -1,0 +1,7 @@
+beautifulsoup4
+pillow
+PyPDF2
+reportlab
+requests
+selenium
+webdriver-manager

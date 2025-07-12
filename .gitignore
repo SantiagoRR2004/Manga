@@ -1,4 +1,6 @@
 __pycache__/
+.venv/
+
 Manga/.*JPG
 Manga/* CBZ
 Manga/* PDF

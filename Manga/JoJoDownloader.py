@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 from urllib.parse import urlparse, urlunparse
+import tqdm
 
 # https://mangaclash.com/manga/jojos-bizarre-adventure/chapter-1/
 
@@ -24,7 +25,7 @@ folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".JoJoJPG")
 
 # Start and end of the chapters to download
 chapter = 1
-maxDownload = 297
+maxDownload = 900
 
 # Get all the URLs of the chapters
 urls = []
@@ -41,6 +42,7 @@ urls = [url for url in urls if not url.endswith("/")]
 # Ensure there are enough URLs to download
 chapter = max(1, chapter)
 maxDownload = min(maxDownload, len(urls))
+width = len(str(maxDownload))
 
 FileHandling.ensureExistance(folder)
 
@@ -48,18 +50,22 @@ while chapter <= maxDownload:
 
     r = requests.get(urls[chapter - 1])
     page = BeautifulSoup(r.content, "html.parser")
-    images = page.find_all(class_="text-center")
+    images = [i for i in page.find_all(class_="text-center") if i.img is not None]
 
-    for i in images:
-        if i.img is not None:
-            imageUrl = urlunparse(urlparse(i.img["src"])._replace(query=""))
-            if imageUrl.endswith(".jpg"):
-                name = str(chapter * 1000 + int(imageUrl.split("/")[-1][:-4])) + ".jpg"
-            elif imageUrl.endswith(".jpeg"):
-                name = str(chapter * 1000 + int(imageUrl.split("/")[-1][:-5])) + ".jpeg"
-            Internet.downloadImage(i.img["src"], os.path.join(folder, name))
+    for i in tqdm.tqdm(images, desc=f"Capítulo {chapter:0{width}d}"):
 
-    print("Se ha descargado el capítulo " + str(chapter))
+        imageUrl = urlunparse(urlparse(i.img["src"])._replace(query=""))
+        name = None
+
+        formats = [".png", ".jpg", ".jpeg"]
+        for f in formats:
+            if imageUrl.endswith(f):
+                number = imageUrl.split("/")[-1][: -len(f)]
+                if number.isdigit() is True:
+                    name = str(chapter * 1000 + int(number)) + f
+
+        if name is not None:
+            Internet.downloadImage(i.img["src"].strip(), os.path.join(folder, name))
 
     chapter += 1
 

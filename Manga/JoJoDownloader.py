@@ -1,6 +1,6 @@
-from Modules import FileHandling
-from Modules import zipping
-from Modules import Internet
+from modules import FileHandling
+from modules import zipping
+from modules import Internet
 import requests
 from bs4 import BeautifulSoup
 import os

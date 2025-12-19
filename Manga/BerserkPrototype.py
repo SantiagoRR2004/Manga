@@ -1,6 +1,6 @@
-from Modules import FileHandling
-from Modules import Internet
-from Modules import zipping
+from modules import FileHandling
+from modules import Internet
+from modules import zipping
 import os
 
 

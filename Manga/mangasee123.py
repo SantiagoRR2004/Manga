@@ -1,4 +1,4 @@
-from Modules import Internet
+from modules import Internet
 import os
 
 directory = os.path.dirname(os.path.abspath(__file__))

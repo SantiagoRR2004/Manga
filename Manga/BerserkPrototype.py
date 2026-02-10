@@ -3,7 +3,6 @@ from modules import Internet
 from modules import zipping
 import os
 
-
 script = """
 var mainContainerElements = document.getElementsByClassName('MainContainer');
 var images = [];

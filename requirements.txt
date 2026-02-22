@@ -1,4 +1,5 @@
 git+https://github.com/SantiagoRR2004/Modules.git
+black
 beautifulsoup4
 pillow
 PyPDF2

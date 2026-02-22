@@ -12,6 +12,7 @@ def mangasee123UrlsXML(web):
     urls = [item.find("link").text for item in page.find_all("item")]
     return urls[::-1]
 
+
 def mangasee123Downloader(
     manga, chapter, maxDownload, callerDirectory, skip=[], missing=[]
 ):

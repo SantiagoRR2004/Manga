@@ -1,11 +1,10 @@
 from modules import FileHandling, CsvHandling, zipping
-from typing import List, Dict
-import PyPDF2
 from reportlab.pdfgen import canvas
-from PIL import Image
-import os
 from collections import Counter
-import zipfile
+from typing import List, Dict
+from PIL import Image
+import PyPDF2
+import os
 
 
 class MangaCreator:

@@ -1,4 +1,4 @@
-from modules import mangaUtils
+import mangaUtils
 import os
 
 directory = os.path.dirname(os.path.abspath(__file__))

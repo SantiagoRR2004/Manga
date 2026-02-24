@@ -30,7 +30,8 @@ class MangaDownloader:
         self.valid = []
         for downloader in self.DOWNLOADERS:
             d: BaseDownloader = downloader(mangaName)
-            if d.getNumberOfChapters() >= self.minChapters:
+            d.findChapters()
+            if len(d.chapterLinks) >= self.minChapters:
                 self.valid.append(d)
             else:
                 logging.warning(f"{downloader.__name__} does not have enough chapters.")

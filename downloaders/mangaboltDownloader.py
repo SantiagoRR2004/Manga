@@ -10,7 +10,10 @@ class MangaboltDownloader(BaseDownloader):
 
     ORIGIN = "https://mangabolt.com/"
 
-    def getNumberOfChapters(self) -> int:
+    def findChapters(self) -> None:
+
+        # Initial empty list
+        self.chapterLinks = []
 
         # Get the html with the list of mangas
         url = urljoin(self.ORIGIN, "storage/manga-list.html")
@@ -58,7 +61,3 @@ class MangaboltDownloader(BaseDownloader):
                 self.chapterLinks = [
                     urljoin(self.ORIGIN, link["href"]) for link in chapterLinks
                 ][::-1]
-
-                return len(self.chapterLinks)
-
-        return 0

@@ -4,7 +4,7 @@ import requests
 
 class MangaFireDownloader(BaseDownloader):
 
-    def getNumberOfChapters(self) -> int:
+    def findChapters(self) -> None:
         """
         I tried using a web driver, but it keeps reloading.
         The only option is to have the exact name of the manga.
@@ -13,7 +13,7 @@ class MangaFireDownloader(BaseDownloader):
             - None
 
         Returns:
-            - int: The number of chapters of the manga.
+            - None
         """
         url = "https://mangafire.to/manga/" + self.manga.replace(" ", "-")
         response = requests.get(url)
@@ -21,4 +21,4 @@ class MangaFireDownloader(BaseDownloader):
         if response.status_code == 200:
             print("Sorprisingly, the manga can be found in MangaFire.")
 
-        return 0
+        self.chapterLinks = []

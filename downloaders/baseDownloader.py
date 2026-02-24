@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 
 class BaseDownloader(ABC):
 
+    chapterLinks: list[str]
+    foundName: str
+    mainUrl: str
+
     def __init__(self, manga: str):
         """
         Initializes the BaseDownloader with the name of the manga to be downloaded.
@@ -16,20 +20,20 @@ class BaseDownloader(ABC):
         self.manga = manga
 
     @abstractmethod
-    def getNumberOfChapters(self) -> int:
+    def findChapters(self) -> None:
         """
-        This funtion return the number of chapters
-        of the web that were found.
+        This funtion needs store the a list of the urls
+        of each chapter of the manga as set self.chapterLinks.
+        If nothing is found, self.chapterLinks should be an empty list.
 
-        The implementation must also set:
+        If len(self.chapterLinks) > 0 it must also set:
             - self.foundName
             - self.mainUrl
-            - self.chapterLinks
 
         Args:
             - None
 
         Returns:
-            - int: The number of chapters that the manga has.
+            - None
         """
         pass

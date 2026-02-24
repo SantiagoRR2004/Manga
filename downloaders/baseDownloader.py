@@ -21,6 +21,11 @@ class BaseDownloader(ABC):
         This funtion return the number of chapters
         of the web that were found.
 
+        The implementation must also set:
+            - self.foundName
+            - self.mainUrl
+            - self.chapterLinks
+
         Args:
             - None
 

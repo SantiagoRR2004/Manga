@@ -77,13 +77,15 @@ class MangaDownloader:
 
         return max(len(x) for x in enumeration.values())
 
-    def downloadChapters(self, start: int, maxDownload: int) -> None:
+    def downloadChapters(self, start: int = 1, maxDownload: int = None) -> None:
         """
         Downloads the chapters of the manga using the chosen downloader.
 
         Args:
-            - start (int): The starting chapter number.
-            - maxDownload (int): The maximum number of chapters to download.
+            - start (int): The starting chapter number, default is to start
+                from the first chapter.
+            - maxDownload (int): The maximum number of chapters to download,
+                default is to download all the chapters.
 
         Returns:
             - None
@@ -93,7 +95,12 @@ class MangaDownloader:
 
         # Ensure there are enough URLs to download
         start = max(1, start)
-        maxDownload = min(maxDownload, len(self.chosenDownloader.chapterLinks))
+
+        if maxDownload:
+            maxDownload = min(maxDownload, len(self.chosenDownloader.chapterLinks))
+        else:
+            maxDownload = len(self.chosenDownloader.chapterLinks)
+
         width = len(str(maxDownload))
 
         for chapter, chapterLink in enumerate(

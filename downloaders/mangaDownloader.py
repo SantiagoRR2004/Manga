@@ -1,4 +1,4 @@
-from modules import CsvHandling, FileHandling, Internet
+from modules import CsvHandling, FileHandling, Internet, zipping
 from .mangafireDownloader import MangaFireDownloader
 from .mangaboltDownloader import MangaboltDownloader
 from .baseDownloader import BaseDownloader
@@ -97,7 +97,7 @@ class MangaDownloader:
         width = len(str(maxDownload))
 
         for chapter, chapterLink in enumerate(
-            self.chosenDownloader.chapterLinks[start - 1 : maxDownload + 1], start
+            self.chosenDownloader.chapterLinks[start - 1 : maxDownload], start
         ):
 
             # Get the images
@@ -118,3 +118,5 @@ class MangaDownloader:
 
                 if name:
                     Internet.downloadImage(img, os.path.join(self.imageDirectory, name))
+
+        zipping.zipAndDelete(self.imageDirectory)

@@ -55,12 +55,17 @@ class MangaboltDownloader(BaseDownloader):
 
                 # All links from main with id main-content
                 mainContent = soup2.find(id="main-content")
+
                 chapterLinks = mainContent.find_all("a", href=True)
 
+                seen = set()
+
                 # Invert to have the correct order
-                self.chapterLinks = [
-                    urljoin(self.ORIGIN, link["href"]) for link in chapterLinks
-                ][::-1]
+                for link in chapterLinks[::-1]:
+                    href = urljoin(self.ORIGIN, link["href"])
+                    if href not in seen:
+                        seen.add(href)
+                        self.chapterLinks.append(href)
 
     def getChapterImages(self, chapterUrl: str) -> list[str]:
         """

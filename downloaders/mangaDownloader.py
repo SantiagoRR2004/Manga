@@ -117,6 +117,10 @@ class MangaDownloader:
                         break
 
                 if name:
-                    Internet.downloadImage(img, os.path.join(self.imageDirectory, name))
+                    Internet.downloadImage(
+                        img,
+                        os.path.join(self.imageDirectory, name),
+                        headers={"Referer": chapterLink},
+                    )
 
         zipping.zipAndDelete(self.imageDirectory)

@@ -63,4 +63,46 @@ class MangaboltDownloader(BaseDownloader):
                 ][::-1]
 
     def getChapterImages(self, chapterUrl: str) -> list[str]:
+        """
+        Get the images of a chapter
+
+        Args:
+            - chapterUrl (str): The url of the chapter
+
+        Returns:
+            - list[str]: The list of images
+        """
+        response = requests.get(chapterUrl)
+
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, "html.parser")
+
+            # div with class js-pages-container
+            pagesContainer = soup.find("div", class_="js-pages-container")
+
+            if pagesContainer:
+
+                images = []
+                seen = set()
+
+                # Iterate across text-center divs
+                for div in pagesContainer.find_all("div", class_="text-center"):
+
+                    # Find all the images in the div
+                    for img in div.find_all("img", src=True):
+
+                        src = None
+
+                        # Lazy loaded
+                        if img.get("data-src"):
+                            src = img["data-src"]
+                        elif img.get("src"):
+                            src = img["src"]
+
+                        if src and src not in seen:
+                            seen.add(src)
+                            images.append(src)
+
+                return images
+
         return []

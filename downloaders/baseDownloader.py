@@ -37,3 +37,17 @@ class BaseDownloader(ABC):
             - None
         """
         pass
+
+    @abstractmethod
+    def getChapterImages(self, chapterUrl: str) -> list[str]:
+        """
+        This function needs to return a list of the urls of
+        the images of the chapter given by chapterUrl.
+
+        Args:
+            - chapterUrl (str): The url of the chapter.
+
+        Returns:
+            - list[str]: A list of the urls of the images of the chapter.
+        """
+        pass

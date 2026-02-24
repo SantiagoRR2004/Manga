@@ -22,3 +22,6 @@ class MangaFireDownloader(BaseDownloader):
             print("Sorprisingly, the manga can be found in MangaFire.")
 
         self.chapterLinks = []
+
+    def getChapterImages(self, chapterUrl: str) -> list[str]:
+        return []

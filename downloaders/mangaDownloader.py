@@ -3,6 +3,7 @@ from .mangaboltDownloader import MangaboltDownloader
 from .baseDownloader import BaseDownloader
 from modules import CsvHandling
 import logging
+import tqdm
 import os
 
 
@@ -36,6 +37,17 @@ class MangaDownloader:
             else:
                 logging.warning(f"{downloader.__name__} does not have enough chapters.")
 
+        # If no downloader is valid, print a warning
+        if not self.valid:
+            logging.warning("No downloader found with enough chapters.")
+            return
+
+        if len(self.valid) > 1:
+            # TODO: Make the user choose
+            pass
+
+        self.chosenDownloader: BaseDownloader = self.valid[0]
+
     def getMinimumChapters(self) -> int:
         """
         Returns the minimum number of chapter that the numeration has.
@@ -60,3 +72,29 @@ class MangaDownloader:
         enumeration = CsvHandling.openCsv(enumerationFile)
 
         return max(len(x) for x in enumeration.values())
+
+    def downloadChapters(self, start: int, maxDownload: int) -> None:
+        """
+        Downloads the chapters of the manga using the chosen downloader.
+
+        Args:
+            - start (int): The starting chapter number.
+            - maxDownload (int): The maximum number of chapters to download.
+
+        Returns:
+            - None
+        """
+        # Ensure there are enough URLs to download
+        start = max(1, start)
+        maxDownload = min(maxDownload, len(self.chosenDownloader.chapterLinks))
+        width = len(str(maxDownload))
+
+        for chapter, chapterLink in enumerate(
+            self.chosenDownloader.chapterLinks[start - 1 : maxDownload + 1], start
+        ):
+
+            # Get the images
+            images = self.chosenDownloader.getChapterImages(chapterLink)
+
+            for i in tqdm.tqdm(images, desc=f"Chapter {chapter:0{width}d}"):
+                pass

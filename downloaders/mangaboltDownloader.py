@@ -61,3 +61,6 @@ class MangaboltDownloader(BaseDownloader):
                 self.chapterLinks = [
                     urljoin(self.ORIGIN, link["href"]) for link in chapterLinks
                 ][::-1]
+
+    def getChapterImages(self, chapterUrl: str) -> list[str]:
+        return []

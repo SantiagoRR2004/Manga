@@ -1,7 +1,7 @@
+from modules import CsvHandling, FileHandling, Internet
 from .mangafireDownloader import MangaFireDownloader
 from .mangaboltDownloader import MangaboltDownloader
 from .baseDownloader import BaseDownloader
-from modules import CsvHandling
 import logging
 import tqdm
 import os
@@ -9,6 +9,7 @@ import os
 
 class MangaDownloader:
     DOWNLOADERS: list[BaseDownloader] = [MangaFireDownloader, MangaboltDownloader]
+    FORMATS = [".png", ".jpg", ".jpeg"]
 
     def __init__(self, mangaName: str, mangaDirectory: str) -> None:
         """
@@ -24,6 +25,9 @@ class MangaDownloader:
         """
         self.manga = mangaName
         self.directory = mangaDirectory
+        self.imageDirectory = os.path.join(
+            mangaDirectory, "." + mangaName.replace(" ", "") + "JPG"
+        )
 
         self.minChapters = self.getMinimumChapters()
 
@@ -84,6 +88,9 @@ class MangaDownloader:
         Returns:
             - None
         """
+        # Ensure the image directory exists
+        FileHandling.ensureExistance(self.imageDirectory)
+
         # Ensure there are enough URLs to download
         start = max(1, start)
         maxDownload = min(maxDownload, len(self.chosenDownloader.chapterLinks))
@@ -96,5 +103,18 @@ class MangaDownloader:
             # Get the images
             images = self.chosenDownloader.getChapterImages(chapterLink)
 
-            for i in tqdm.tqdm(images, desc=f"Chapter {chapter:0{width}d}"):
-                pass
+            for n, img in tqdm.tqdm(
+                enumerate(images, 1),
+                desc=f"Chapter {chapter:0{width}d}",
+                total=len(images),
+            ):
+
+                name = None
+                for f in self.FORMATS:
+                    if img.endswith(f):
+                        # No chapter should have more than 1000 pages
+                        name = str(chapter * 1000 + n) + f
+                        break
+
+                if name:
+                    Internet.downloadImage(img, os.path.join(self.imageDirectory, name))

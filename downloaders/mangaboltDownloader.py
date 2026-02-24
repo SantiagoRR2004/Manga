@@ -95,9 +95,9 @@ class MangaboltDownloader(BaseDownloader):
 
                         # Lazy loaded
                         if img.get("data-src"):
-                            src = img["data-src"]
+                            src = img["data-src"].strip()
                         elif img.get("src"):
-                            src = img["src"]
+                            src = img["src"].strip()
 
                         if src and src not in seen:
                             seen.add(src)

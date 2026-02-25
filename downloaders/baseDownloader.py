@@ -1,4 +1,6 @@
+from selenium.webdriver.common.by import By
 from abc import ABC, abstractmethod
+from modules import Internet
 
 
 class BaseDownloader(ABC):
@@ -51,3 +53,52 @@ class BaseDownloader(ABC):
             - list[str]: A list of the urls of the images of the chapter.
         """
         pass
+
+    def getDriver(self) -> Internet.webdriver.Chrome:
+        """
+        Returns a configured Chrome WebDriver instance.
+
+        Args:
+            - None
+
+        Returns:
+            - Internet.webdriver.Chrome: A configured Chrome WebDriver instance.
+        """
+        driver = Internet.configureChrome()
+
+        # Override attachShadow BEFORE page load
+        driver.execute_cdp_cmd(
+            "Page.addScriptToEvaluateOnNewDocument",
+            {"source": """
+                (function() {
+                    const originalAttachShadow = Element.prototype.attachShadow;
+                    Element.prototype.attachShadow = function(init) {
+                        return originalAttachShadow.call(this, { mode: 'open' });
+                    };
+                })();
+                """},
+        )
+
+        return driver
+
+    def skipCloudflare(
+        self, driver: Internet.webdriver.Chrome
+    ) -> Internet.webdriver.Chrome:
+        """
+        Try to skip Cloudflare protection if it is present.
+
+        Args:
+            - driver (Internet.webdriver.Chrome): The Chrome WebDriver instance.
+
+        Returns:
+            - Internet.webdriver.Chrome: The Chrome WebDriver instance after trying to skip Cloudflare.
+        """
+        hosts = driver.find_elements(By.CSS_SELECTOR, "div")
+
+        for host in hosts:
+            shadow_root = driver.execute_script("return arguments[0].shadowRoot", host)
+            if shadow_root:
+                break
+
+        outer_iframe = shadow_root.find_element(By.CSS_SELECTOR, "iframe")
+        driver.switch_to.frame(outer_iframe)

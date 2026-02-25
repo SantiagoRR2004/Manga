@@ -1,14 +1,13 @@
 from modules import CsvHandling, FileHandling, Internet, zipping
-from .mangafireDownloader import MangaFireDownloader
-from .mangaboltDownloader import MangaboltDownloader
 from .baseDownloader import BaseDownloader
+import downloaders
 import logging
 import tqdm
 import os
 
 
 class MangaDownloader:
-    DOWNLOADERS: list[BaseDownloader] = [MangaFireDownloader, MangaboltDownloader]
+    DOWNLOADERS = downloaders.DOWNLOADERS
     FORMATS = [".png", ".jpg", ".jpeg"]
 
     def __init__(self, mangaName: str, mangaDirectory: str) -> None:
@@ -34,7 +33,7 @@ class MangaDownloader:
         # Check which downloaders work
         self.valid = []
         for downloader in self.DOWNLOADERS:
-            d: BaseDownloader = downloader(mangaName)
+            d = downloader(mangaName)
             d.findChapters()
             if len(d.chapterLinks) >= self.minChapters:
                 self.valid.append(d)

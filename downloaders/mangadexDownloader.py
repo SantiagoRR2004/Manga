@@ -26,71 +26,124 @@ class MangaDexDownloader(BaseDownloader):
         # Initial empty list
         self.chapterLinks = []
 
-        driver = Internet.configureChrome()
+        self.driver = Internet.configureChrome()
 
-        url = urljoin(
-            self.ORIGIN, "/search?q=" + self.manga.replace(" ", "+") + "&tab=titles"
-        )
-        driver.get(url)
-        time.sleep(2)
+        # Get the possible mangas
+        mangas = self.getOptions()
 
-        soup = BeautifulSoup(driver.page_source, "html.parser")
-
-        # First find the div with class "md-content flex-grow"
-        # Find a div without class inside it
-        mangaDiv = [
-            div
-            for div in soup.find("div", class_="md-content flex-grow").find_all("div")
-            if not div.get("class")
-        ][0]
-
-        options = {}
-
-        for div in mangaDiv.find_all("div", class_="manga-card"):
-            aTag = div.find("a", class_="font-bold title", href=True)
-
-            if aTag:
-                name = aTag.text.strip()
-                options[name] = urljoin(self.ORIGIN, aTag["href"].strip())
-
-        if options:
+        if mangas:
             # Find the best match
             self.foundName = max(
-                options,
+                mangas,
                 key=lambda k: difflib.SequenceMatcher(None, k, self.manga).ratio(),
             )
-            self.mainUrl = options[self.foundName]
+            self.mainUrl = mangas[self.foundName]
 
-            # Need to find the reading list
-            driver.get(self.mainUrl)
-            time.sleep(2)
+            # Now we get the reading list
+            if self.findReadingList():
 
-            soup2 = BeautifulSoup(driver.page_source, "html.parser")
+                # The chapter list
+                self.chaptersInsideReadingList()
 
-            # Div with class "chapter relative read"
-            firstDiv = soup2.find("div", class_="chapter relative read")
-            # Found the reading list
+        if len(self.chapterLinks) == 0:
+            self.driver.quit()
+
+    def getOptions(self) -> dict:
+        """
+        Get the different possible mangas.
+
+        Args:
+            - None
+
+        Returns:
+            - dict: A dictionary with the options for the manga.
+        """
+        initialUrl = urljoin(
+            self.ORIGIN, "/search?q=" + self.manga.replace(" ", "+") + "&tab=titles"
+        )
+
+        self.driver.get(initialUrl)
+        time.sleep(2)
+
+        soup = BeautifulSoup(self.driver.page_source, "html.parser")
+
+        # First find the div with class "md-content flex-grow"
+        container = soup.find("div", class_="md-content flex-grow")
+
+        if container:
+            # Find a div without class inside it
+            noClass = [div for div in container.find_all("div") if not div.get("class")]
+
+            if noClass:
+                # The first one
+                mangaDiv = noClass[0]
+
+                options = {}
+
+                for div in mangaDiv.find_all("div", class_="manga-card"):
+                    aTag = div.find("a", class_="font-bold title", href=True)
+
+                    if aTag:
+                        name = aTag.text.strip()
+                        options[name] = urljoin(self.ORIGIN, aTag["href"].strip())
+
+                return options
+
+        return {}
+
+    def findReadingList(self) -> bool:
+        """
+        Find the reading list of the manga.
+
+        Args:
+            - None
+
+        Returns:
+            - bool: True if the reading list was found, False otherwise.
+        """
+        self.driver.get(self.mainUrl)
+        time.sleep(2)
+
+        soup = BeautifulSoup(self.driver.page_source, "html.parser")
+
+        # Div with class "chapter relative read"
+        firstDiv = soup.find("div", class_="chapter relative read")
+
+        if firstDiv:
             self.mainUrl = urljoin(
                 self.ORIGIN, firstDiv.find("a", href=True)["href"].strip()
             )
+            return True
 
-            # Now we get the chapter list
-            driver.get(self.mainUrl)
-            time.sleep(2)
-            soup3 = BeautifulSoup(driver.page_source, "html.parser")
+        return False
 
-            # Iterate across li with data-value attribute
-            for li in soup3.find("div", class_="mr-2 ml-2 flex-grow").find_all(
-                "li", attrs={"data-value": True}
-            ):
-                url = urljoin(self.ORIGIN, "chapter/" + li["data-value"].strip())
-                self.chapterLinks.append(url)
+    def chaptersInsideReadingList(self) -> None:
+        """
+        Correctly set the chapterLinks after finding the reading list.
 
-            # Reverse the chapter links to have them in order
-            self.chapterLinks.reverse()
+        Args:
+            - None
 
-        if len(self.chapterLinks) == 0:
-            driver.quit()
+        Returns:
+            - None
+        """
+        self.driver.get(self.mainUrl)
+        time.sleep(2)
+        soup = BeautifulSoup(self.driver.page_source, "html.parser")
+
+        # Iterate across li with data-value attribute
+        for li in soup.find("div", class_="mr-2 ml-2 flex-grow").find_all(
+            "li", attrs={"data-value": True}
+        ):
+            url = urljoin(self.ORIGIN, "chapter/" + li["data-value"].strip())
+            self.chapterLinks.append(url)
+
+        # Reverse the chapter links to have them in order
+        self.chapterLinks.reverse()
+
+        # The first chapter is the main url
+        if self.chapterLinks:
+            self.mainUrl = self.chapterLinks[0]
 
     def getChapterImages(self, chapterUrl: str) -> list[str]:
         # TODO

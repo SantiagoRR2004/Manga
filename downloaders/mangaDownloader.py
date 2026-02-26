@@ -31,7 +31,7 @@ class MangaDownloader:
         self.minChapters = self.getMinimumChapters()
 
         # Check which downloaders work
-        self.valid = []
+        self.valid: list[BaseDownloader] = []
         for downloader in self.DOWNLOADERS:
             d = downloader(mangaName)
             d.findChapters()
@@ -45,11 +45,26 @@ class MangaDownloader:
             logging.warning("No downloader found with enough chapters.")
             return
 
-        if len(self.valid) > 1:
-            # TODO: Make the user choose
-            pass
+        self.chosenDownloader: BaseDownloader = None
 
-        self.chosenDownloader: BaseDownloader = self.valid[0]
+        if len(self.valid) > 1:
+
+            # Make the user choose
+            while not self.chosenDownloader:
+                print("Multiple downloaders found:")
+
+                for i, downloader in enumerate(self.valid, 1):
+                    print(f'[{i}] "{downloader.foundName}" ({downloader.mainUrl})')
+
+                choice = input("Choose a downloader by number: ")
+
+                if choice.isdigit() and 1 <= int(choice) <= len(self.valid):
+                    self.chosenDownloader = self.valid[int(choice) - 1]
+                else:
+                    print("Invalid choice. Please try again.")
+
+        else:
+            self.chosenDownloader = self.valid[0]
 
     def getMinimumChapters(self) -> int:
         """

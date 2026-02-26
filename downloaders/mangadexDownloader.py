@@ -14,7 +14,8 @@ class MangaDexDownloader(BaseDownloader):
         """
         Find the chapters of the manga and store them in the chapterLinks attribute.
 
-        Need to use Selenium to find the manga.
+        Need to use Selenium to find the manga, then the reading list
+        and finally the chapter list.
 
         Args:
             - None
@@ -43,9 +44,6 @@ class MangaDexDownloader(BaseDownloader):
             if not div.get("class")
         ][0]
 
-        with open("debug.html", "w", encoding="utf-8") as f:
-            f.write(str(mangaDiv))
-
         options = {}
 
         for div in mangaDiv.find_all("div", class_="manga-card"):
@@ -53,8 +51,7 @@ class MangaDexDownloader(BaseDownloader):
 
             if aTag:
                 name = aTag.text.strip()
-                url = urljoin(self.ORIGIN, aTag["href"].strip())
-                options[name] = url
+                options[name] = urljoin(self.ORIGIN, aTag["href"].strip())
 
         if options:
             # Find the best match
@@ -64,7 +61,36 @@ class MangaDexDownloader(BaseDownloader):
             )
             self.mainUrl = options[self.foundName]
 
-            print(self.mainUrl)
+            # Need to find the reading list
+            driver.get(self.mainUrl)
+            time.sleep(2)
+
+            soup2 = BeautifulSoup(driver.page_source, "html.parser")
+
+            # Div with class "chapter relative read"
+            firstDiv = soup2.find("div", class_="chapter relative read")
+            # Found the reading list
+            self.mainUrl = urljoin(
+                self.ORIGIN, firstDiv.find("a", href=True)["href"].strip()
+            )
+
+            # Now we get the chapter list
+            driver.get(self.mainUrl)
+            time.sleep(2)
+            soup3 = BeautifulSoup(driver.page_source, "html.parser")
+
+            # Iterate across li with data-value attribute
+            for li in soup3.find("div", class_="mr-2 ml-2 flex-grow").find_all(
+                "li", attrs={"data-value": True}
+            ):
+                url = urljoin(self.ORIGIN, "chapter/" + li["data-value"].strip())
+                self.chapterLinks.append(url)
+
+            # Reverse the chapter links to have them in order
+            self.chapterLinks.reverse()
+
+        if len(self.chapterLinks) == 0:
+            driver.quit()
 
     def getChapterImages(self, chapterUrl: str) -> list[str]:
         # TODO

@@ -1,0 +1,1 @@
+from .mangaCreator import MangaCreator

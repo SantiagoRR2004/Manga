@@ -2,6 +2,7 @@ from .baseDownloader import BaseDownloader
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from modules import Internet
+import requests
 import difflib
 import time
 
@@ -13,6 +14,8 @@ class MangaDexDownloader(BaseDownloader):
     def findChapters(self) -> None:
         """
         Find the chapters of the manga and store them in the chapterLinks attribute.
+
+        TODO: Try to also use the API
 
         Need to use Selenium to find the manga, then the reading list
         and finally the chapter list.
@@ -45,8 +48,9 @@ class MangaDexDownloader(BaseDownloader):
                 # The chapter list
                 self.chaptersInsideReadingList()
 
-        if len(self.chapterLinks) == 0:
-            self.driver.quit()
+        # Alway quit the driver because we use the API
+        # if len(self.chapterLinks) == 0:
+        self.driver.quit()
 
     def getOptions(self) -> dict:
         """
@@ -146,5 +150,38 @@ class MangaDexDownloader(BaseDownloader):
             self.mainUrl = self.chapterLinks[0]
 
     def getChapterImages(self, chapterUrl: str) -> list[str]:
-        # TODO
+        """
+        Use the official API to get the chapter images.
+
+        Args:
+            - chapterUrl (str): The URL of the chapter.
+
+        Returns:
+            - list[str]: A list of URLs of the chapter images.
+        """
+        chapterHash = chapterUrl.split("/")[-1]
+        url = f"https://api.mangadex.org/at-home/server/{chapterHash}"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+
+            if data["result"] == "ok":
+
+                base = (
+                    "https://uploads.mangadex.org/data/" + data["chapter"]["hash"] + "/"
+                )
+                images = [base + filename for filename in data["chapter"]["data"]]
+
+                return images
+
+            else:
+                import json
+
+                with open("debug.json", "w") as f:
+                    json.dump(data, f, indent=4)
+
+                raise Exception("Error in API response: " + data["result"])
+
         return []

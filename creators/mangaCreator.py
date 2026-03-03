@@ -1,8 +1,9 @@
-from modules import FileHandling, CsvHandling, zipping
+from modules import FileHandling, zipping
 from reportlab.pdfgen import canvas
 from collections import Counter
 from typing import List, Dict
 from PIL import Image
+import pandas as pd
 import PyPDF2
 import os
 
@@ -33,7 +34,7 @@ class MangaCreator:
         FileHandling.ensureExistance(imageFolder)
         self.images = sorted(os.listdir(imageFolder))
 
-    def getEnumeration(self) -> Dict[str, List[str]]:
+    def getEnumeration(self) -> pd.DataFrame:
         """
         Reads the enumeration file for the manga and returns its content as a dictionary.
 
@@ -43,8 +44,7 @@ class MangaCreator:
             - None
 
         Returns:
-            - Dict[str, List[str]]: The enumeration dictionary where keys are categories
-              and values are lists of items in those categories.
+            - pd.DataFrame: The enumeration DataFrame.
         """
         enumerationFile = os.path.join(
             self.callerDirectory, self.manga.replace(" ", "") + "Numeration.csv"
@@ -53,30 +53,31 @@ class MangaCreator:
             Warning("Enumeration file not found.")
             return
 
-        enumeration = CsvHandling.openCsv(enumerationFile)
+        enumeration = pd.read_csv(enumerationFile)
 
         # Store the minimum for later use
         self.minimum = self.getMinimum(enumeration)
 
         return enumeration
 
-    def getMinimum(self, enumeration: Dict[str, List[str]]) -> str:
+    def getMinimum(self, enumeration: pd.DataFrame) -> str:
         """
-        Search for the first unique key in the enumeration dictionary.
+        Search for the first unique key in the enumeration DataFrame.
 
         Args:
-            - enumeration (Dict[str, List[str]]): The enumeration dictionary.
+            - enumeration (pd.DataFrame): The enumeration DataFrame.
 
         Returns:
-            - str: The first key with unique values in its list.
+            - str: The first key with unique values in its column.
         """
-        for key in enumeration:
+        for key in enumeration.columns:
             if len(set(enumeration[key])) == len(enumeration[key]):
                 return key
 
     def createFiles(self, division: str, extension: str) -> None:
         methodName = f"create{extension.upper()}"
         method = getattr(self, methodName, None)
+        self.division = division
 
         # Check if the method exists and is callable
         if not callable(method):
@@ -89,30 +90,33 @@ class MangaCreator:
         FileHandling.ensureExistance(finalFolder)
 
         dividedImages = self.divider(division)
-        names = [n + "." + extension.lower() for n in self.getNames(division)]
+        names = {
+            ogName: n + "." + extension.lower()
+            for ogName, n in self.getNames(dividedImages).items()
+        }
 
         # Create the temporal folder if it doesn't exist
         FileHandling.ensureExistance(self.temporalFolder)
 
-        for i, segment in enumerate(dividedImages):
+        for ogName, segment in dividedImages.items():
 
             # Check if the segment is empty
             if not segment:
-                print(f"No images found for '{names[i]}'.")
+                print(f"No images found for '{names[ogName]}'.")
             else:
-                fileName = os.path.join(finalFolder, names[i])
+                fileName = os.path.join(finalFolder, names[ogName])
 
                 try:
                     method(segment, fileName)
                     print(f"{fileName} created successfully!")
                 except Exception as e:
-                    print(f"Error creating {names[i]}: {e}")
+                    print(f"Error creating {names[ogName]}: {e}")
 
         # Clean up
         zipping.zipAndDelete(self.imageFolder)
         FileHandling.deleteFolder(self.temporalFolder)
 
-    def divider(self, division: str) -> List[List[str]]:
+    def divider(self, division: str) -> Dict[str, List[str]]:
         """
         Divides the images based on the unique values in the specified division.
 
@@ -120,56 +124,42 @@ class MangaCreator:
             - division (str): The key in the enumeration dictionary to divide the images by.
 
         Returns:
-            - List[List[str]]: A list of lists, where each inner list contains images
-              corresponding to a unique value in the specified division.
+            - Dict[str, List[str]]: A dictionary where keys are unique values in
+                the division and values are lists of images corresponding to each unique value.
         """
-        toret = []
+        # Precompute image markers
+        imageMap = {"".join(image.split(".")[:-1])[:-3]: [] for image in self.images}
 
-        # This is like a set, but it keeps the order
-        uniqueList = [
-            name
-            for i, name in enumerate(self.enumeration[division])
-            if name not in self.enumeration[division][:i]
-        ]
+        for image in self.images:
+            marker = "".join(image.split(".")[:-1])  # Remove the extension
+            marker = marker[:-3]  # No more than 999 images
+            imageMap[marker].append(image)
 
-        # Remove None values if they exist
-        if None in uniqueList:
-            uniqueList.remove(None)
+        # Drop NaN and group by division
+        grouped = self.enumeration.dropna(subset=[division]).groupby(
+            division, sort=False
+        )[self.minimum]
 
-        # Divide the files based on the unique values in the division
-        for i in uniqueList:
-            segment = []
-            for j in range(len(self.enumeration[division])):
-                if self.enumeration[division][j] == i:
-
-                    for image in self.images:
-                        marker = "".join(image.split(".")[:-1])  # Remove the extension
-                        marker = marker[:-3]  # No more than 999 images
-                        if marker == self.enumeration[self.minimum][j]:
-                            segment.append(image)
-
-            toret.append(segment)
+        # Build result
+        toret = {
+            key: [image for marker in group for image in imageMap.get(marker, [])]
+            for key, group in grouped
+        }
 
         return toret
 
-    def getNames(self, division: str) -> List[str]:
+    def getNames(self, dividedImages: Dict[str, List[str]]) -> Dict[str, str]:
         """
         Returns the names of the manga based on the specified division.
 
         Args:
-            - division (str): The key in the enumeration dictionary to get names from.
+            - dividedImages (Dict[str, List[str]]): The dictionary of divided images.
 
         Returns:
-            - List[str]: A list of names corresponding to the unique values in the division.
+            - Dict[str, str]: The map where keys are the unique values
+                in the division and values are the corresponding names.
         """
-        uniqueList = []
-
-        # This is like a set, but it keeps the order
-        [
-            uniqueList.append(x)
-            for x in self.enumeration[division]
-            if x not in uniqueList
-        ]
+        uniqueList = list(dividedImages.keys())
 
         in_order = sum(
             1 for i in range(len(uniqueList) - 1) if uniqueList[i] <= uniqueList[i + 1]
@@ -177,19 +167,19 @@ class MangaCreator:
         total_pairs = len(uniqueList) - 1
         needNumberFlag = (in_order / total_pairs) < 0.9
 
-        names = []
+        names = {}
 
-        for i in range(len(uniqueList)):
+        for i, n in enumerate(uniqueList):
             if needNumberFlag:
-                middle = division + " " + str(i + 1)
+                middle = self.division + " " + str(i + 1)
             else:
-                middle = division
+                middle = self.division
 
             middle = middle + " " + uniqueList[i]
 
             name = self.manga + " " + middle
 
-            names.append(name)
+            names[n] = name
 
         return names
 

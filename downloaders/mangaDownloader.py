@@ -1,5 +1,6 @@
 from modules import CsvHandling, FileHandling, Internet, zipping
 from .baseDownloader import BaseDownloader
+from urllib.parse import urlparse
 import downloaders
 import logging
 import tqdm
@@ -130,9 +131,11 @@ class MangaDownloader:
                 total=len(images),
             ):
 
+                path = urlparse(img).path
+
                 name = None
                 for f in self.FORMATS:
-                    if img.endswith(f):
+                    if path.endswith(f):
                         # No chapter should have more than 1000 pages
                         name = str(chapter * 1000 + n) + f
                         break

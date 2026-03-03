@@ -176,6 +176,14 @@ class MangaCreator:
             for key, group in grouped
         }
 
+        # Unused images are added
+        usedMarkers = [marker for _, group in grouped for marker in group]
+        unused = {div: imgs for div, imgs in imageMap.items() if div not in usedMarkers}
+
+        for div, imgs in unused.items():
+            if not toret.get(div):
+                toret[div] = imgs
+
         return toret
 
     def getNames(self, dividedImages: Dict[str, List[str]]) -> Dict[str, str]:

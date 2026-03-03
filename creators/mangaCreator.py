@@ -4,6 +4,7 @@ from collections import Counter
 from typing import List, Dict
 from PIL import Image
 import pandas as pd
+import logging
 import PyPDF2
 import os
 
@@ -50,7 +51,7 @@ class MangaCreator:
             self.callerDirectory, self.manga.replace(" ", "") + "Numeration.csv"
         )
         if not os.path.exists(enumerationFile):
-            Warning("Enumeration file not found.")
+            logging.warning("Enumeration file not found.")
             return
 
         enumeration = pd.read_csv(enumerationFile)
@@ -74,22 +75,50 @@ class MangaCreator:
             if len(set(enumeration[key])) == len(enumeration[key]):
                 return key
 
-    def createFiles(self, division: str, extension: str) -> None:
+    def createFiles(self, division: str = None, extension: str = "CBZ") -> None:
+        """
+        Creates the files for the manga based on the specified division and extension.
+
+        If there is no enumeration or the division is not given, it defaults to "Chapter".
+
+        Args:
+            - division (str): The division to use for creating the files.
+            - extension (str): The extension of the files to create (PDF, CBZ, ZIP).
+
+        Returns:
+            - None
+        """
         methodName = f"create{extension.upper()}"
         method = getattr(self, methodName, None)
         self.division = division
 
         # Check if the method exists and is callable
         if not callable(method):
-            print(f"Unsupported extension: {extension}")
-            return
+            raise ValueError(f"Unsupported extension: {extension}")
+
+        # Check if the division exists in the enumeration
+        if (
+            self.enumeration is not None
+            and self.division not in self.enumeration.columns
+        ):
+            raise ValueError(f"Division '{self.division}' not found in enumeration.")
+
+        elif self.enumeration is None:
+            # Use Chapter ad default division if no enumeration is provided
+            logging.warning("Using 'Chapter' as default division.")
+            self.division = "Chapter"
+
+        elif self.division is None:
+            # Use the minimum instead
+            logging.warning(f"Using '{self.minimum}' as division.")
+            self.division = self.minimum
 
         finalFolder = os.path.join(
             self.callerDirectory, self.manga.replace(" ", "") + " " + extension.upper()
         )
         FileHandling.ensureExistance(finalFolder)
 
-        dividedImages = self.divider(division)
+        dividedImages = self.divider()
         names = {
             ogName: n + "." + extension.lower()
             for ogName, n in self.getNames(dividedImages).items()
@@ -116,12 +145,9 @@ class MangaCreator:
         zipping.zipAndDelete(self.imageFolder)
         FileHandling.deleteFolder(self.temporalFolder)
 
-    def divider(self, division: str) -> Dict[str, List[str]]:
+    def divider(self) -> Dict[str, List[str]]:
         """
         Divides the images based on the unique values in the specified division.
-
-        Args:
-            - division (str): The key in the enumeration dictionary to divide the images by.
 
         Returns:
             - Dict[str, List[str]]: A dictionary where keys are unique values in
@@ -135,9 +161,13 @@ class MangaCreator:
             marker = marker[:-3]  # No more than 999 images
             imageMap[marker].append(image)
 
+        # If no enumeration, use map directly
+        if self.enumeration is None:
+            return imageMap
+
         # Drop NaN and group by division
-        grouped = self.enumeration.dropna(subset=[division]).groupby(
-            division, sort=False
+        grouped = self.enumeration.dropna(subset=[self.division]).groupby(
+            self.division, sort=False
         )[self.minimum]
 
         # Build result
@@ -161,11 +191,16 @@ class MangaCreator:
         """
         uniqueList = list(dividedImages.keys())
 
-        in_order = sum(
-            1 for i in range(len(uniqueList) - 1) if uniqueList[i] <= uniqueList[i + 1]
-        )
-        total_pairs = len(uniqueList) - 1
-        needNumberFlag = (in_order / total_pairs) < 0.9
+        if len(uniqueList) <= 1:
+            needNumberFlag = False
+        else:
+            inOrder = sum(
+                1
+                for i in range(len(uniqueList) - 1)
+                if uniqueList[i] <= uniqueList[i + 1]
+            )
+            total_pairs = len(uniqueList) - 1
+            needNumberFlag = (inOrder / total_pairs) < 0.9
 
         names = {}
 

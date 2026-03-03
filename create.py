@@ -6,4 +6,4 @@ manga = "Berserk"
 division = "Episode"
 
 mangaCreator = MangaCreator(manga, directory)
-mangaCreator.createFiles(division, "CBZ")
+mangaCreator.createFiles(division)

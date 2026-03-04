@@ -8,3 +8,6 @@ Manga/* ZIP
 Manga/.*JPG.zip
 
 .Temporal/
+
+# Open csv files
+.~lock.*.csv#

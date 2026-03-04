@@ -147,38 +147,39 @@ class MangaCreator:
 
     def divider(self) -> Dict[str, List[str]]:
         """
-        Divides the images based on the unique values in the specified division.
+        Divides the images based on the rows values in the specified division.
+
+        It will add the remaining images if there are not enough rows.
+
+        Args:
+            - None
 
         Returns:
             - Dict[str, List[str]]: A dictionary where keys are unique values in
                 the division and values are lists of images corresponding to each unique value.
         """
         # Precompute image markers
-        imageMap = {"".join(image.split(".")[:-1])[:-3]: [] for image in self.images}
+        imageMap = {int(image.split(".")[0][:-3]): [] for image in self.images}
 
         for image in self.images:
-            marker = "".join(image.split(".")[:-1])  # Remove the extension
-            marker = marker[:-3]  # No more than 999 images
+            # Remove the extension and no more than 999 images
+            marker = int(image.split(".")[0][:-3])
             imageMap[marker].append(image)
 
         # If no enumeration, use map directly
         if self.enumeration is None:
             return imageMap
 
-        # Drop NaN and group by division
-        grouped = self.enumeration.dropna(subset=[self.division]).groupby(
-            self.division, sort=False
-        )[self.minimum]
+        uniqueValues = self.enumeration[self.division].dropna().unique().tolist()
+        toret = {key: [] for key in uniqueValues}
 
-        # Build result
-        toret = {
-            key: [image for marker in group for image in imageMap.get(marker, [])]
-            for key, group in grouped
-        }
+        # Add images by division
+        for rowIndex, div in self.enumeration[self.division].dropna().items():
+            toret[div].extend(imageMap[rowIndex + 1])
 
         # Unused images are added
-        usedMarkers = [marker for _, group in grouped for marker in group]
-        unused = {div: imgs for div, imgs in imageMap.items() if div not in usedMarkers}
+        nRows = self.enumeration.shape[0]
+        unused = {div: imgs for div, imgs in imageMap.items() if div > nRows}
 
         for div, imgs in unused.items():
             if not toret.get(div):
@@ -205,7 +206,7 @@ class MangaCreator:
             inOrder = sum(
                 1
                 for i in range(len(uniqueList) - 1)
-                if uniqueList[i] <= uniqueList[i + 1]
+                if str(uniqueList[i]) <= str(uniqueList[i + 1])
             )
             total_pairs = len(uniqueList) - 1
             needNumberFlag = (inOrder / total_pairs) < 0.9
@@ -218,7 +219,7 @@ class MangaCreator:
             else:
                 middle = self.division
 
-            middle = middle + " " + uniqueList[i]
+            middle = middle + " " + str(uniqueList[i])
 
             name = self.manga + " " + middle
 

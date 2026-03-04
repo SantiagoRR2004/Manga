@@ -69,7 +69,7 @@ class MangaDownloader:
 
     def getMinimumChapters(self) -> int:
         """
-        Returns the minimum number of chapter that the numeration has.
+        Returns the minimum number of chapter that the enumeration has.
         This number is important because the web will be required to have
         more than this number of chapters to be able to download the manga.
 
@@ -77,10 +77,10 @@ class MangaDownloader:
             - None
 
         Returns:
-            - int: The minimum number of chapter that the numeration has.
+            - int: The minimum number of chapter that the enumeration has.
         """
         enumerationFile = os.path.join(
-            self.directory, f"{self.manga.replace(' ', '')}Numeration.csv"
+            self.directory, f"{self.manga.replace(' ', '')}Enumeration.csv"
         )
 
         # Check it exists

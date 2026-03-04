@@ -48,7 +48,7 @@ class MangaCreator:
             - pd.DataFrame: The enumeration DataFrame.
         """
         enumerationFile = os.path.join(
-            self.callerDirectory, self.manga.replace(" ", "") + "Numeration.csv"
+            self.callerDirectory, self.manga.replace(" ", "") + "Enumeration.csv"
         )
         if not os.path.exists(enumerationFile):
             logging.warning("Enumeration file not found.")

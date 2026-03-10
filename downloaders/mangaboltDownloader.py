@@ -33,14 +33,16 @@ class MangaboltDownloader(BaseDownloader):
                     onclick = entry.get("onclick", "")
                     match = re.search(r"location\.href=['\"]([^'\"]+)['\"]", onclick)
 
-                    href = urljoin(self.ORIGIN, match.group(1))
-                    title_tag = entry.find("h2") or entry.find(
-                        "span", class_="item-title"
-                    )
+                    # Ensure the link is valid and has a title
+                    if match:
+                        href = urljoin(self.ORIGIN, match.group(1))
+                        title_tag = entry.find("h2") or entry.find(
+                            "span", class_="item-title"
+                        )
 
-                    title = title_tag.get_text(strip=True)
-                    if title:
-                        mangaLinks[title] = href
+                        title = title_tag.get_text(strip=True)
+                        if title:
+                            mangaLinks[title] = href
 
             self.foundName = max(
                 mangaLinks,

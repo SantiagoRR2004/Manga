@@ -75,8 +75,31 @@ class WeebCentralDownloader(BaseDownloader):
             # Fix the order of the chapters
             self.chapterLinks.reverse()
 
-        self.driver.quit()
+        else:
+            self.driver.quit()
 
     def getChapterImages(self, chapterUrl: str) -> list[str]:
-        # TODO
-        return []
+        """
+        Get the images of a chapter.
+
+        Args:
+            - chapterUrl (str): The url of the chapter
+
+        Returns:
+            - list[str]: The list of images
+        """
+        # Use Selenium
+        self.driver.get(chapterUrl)
+        time.sleep(2)
+        soup = BeautifulSoup(self.driver.page_source, "html.parser")
+
+        # The section with the images
+        section = soup.find("section", {"hx-get": f"{chapterUrl}/images"})
+
+        images = []
+
+        # Iterate through <img>
+        for img in section.find_all("img", src=True):
+            images.append(img["src"])
+
+        return images

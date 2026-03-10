@@ -54,7 +54,7 @@ class BaseDownloader(ABC):
         """
         pass
 
-    def getDriver(self) -> Internet.webdriver.Chrome:
+    def getDriver(self) -> Internet.WebDriver:
         """
         Returns a configured Chrome WebDriver instance.
 
@@ -62,7 +62,7 @@ class BaseDownloader(ABC):
             - None
 
         Returns:
-            - Internet.webdriver.Chrome: A configured Chrome WebDriver instance.
+            - webdriver.Chrome: A configured Chrome WebDriver instance.
         """
         driver = Internet.configureChrome()
 
@@ -81,17 +81,15 @@ class BaseDownloader(ABC):
 
         return driver
 
-    def skipCloudflare(
-        self, driver: Internet.webdriver.Chrome
-    ) -> Internet.webdriver.Chrome:
+    def skipCloudflare(self, driver: Internet.WebDriver) -> Internet.WebDriver:
         """
         Try to skip Cloudflare protection if it is present.
 
         Args:
-            - driver (Internet.webdriver.Chrome): The Chrome WebDriver instance.
+            - driver (webdriver.Chrome): The Chrome WebDriver instance.
 
         Returns:
-            - Internet.webdriver.Chrome: The Chrome WebDriver instance after trying to skip Cloudflare.
+            - webdriver.Chrome: The Chrome WebDriver instance after trying to skip Cloudflare.
         """
         hosts = driver.find_elements(By.CSS_SELECTOR, "div")
 

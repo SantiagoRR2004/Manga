@@ -175,7 +175,8 @@ class MangaCreator:
 
         # Add images by division
         for rowIndex, div in self.enumeration[self.division].dropna().items():
-            toret[div].extend(imageMap[rowIndex + 1])
+            if rowIndex + 1 in imageMap:
+                toret[div].extend(imageMap[rowIndex + 1])
 
         # Unused images are added
         nRows = self.enumeration.shape[0]

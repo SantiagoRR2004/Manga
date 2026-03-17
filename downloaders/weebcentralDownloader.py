@@ -24,7 +24,7 @@ class WeebCentralDownloader(BaseDownloader):
         # Initial empty list
         self.chapterLinks = []
 
-        self.driver = Internet.configureChrome()
+        self.driver = Internet.configureChrome(headless=False)
         self.driver.minimize_window()
 
         # Search for the manga
